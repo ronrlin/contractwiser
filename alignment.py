@@ -62,10 +62,12 @@ class Alignment(object):
     def get_markup(self):
         return self._content
 
+
 """
 Code below runs tests.
 """
-
+# This is my arbitrary list of stopwords that I noticed were in features.
+# TODO: consider using regex to eliminate numbers and certain words?
 my_stops = [ 'ii', 'iii', 'iv', 'vi', 'vii', 'viii', 'ix', 'xi', 'xii', 'xiii', 'january', 
     'february', 'march', 'april', 'may', 'june', 'july', 'august', 
     'september', 'october', 'november', 'december', '00', '000', '10', 
@@ -75,10 +77,9 @@ my_stops = [ 'ii', 'iii', 'iv', 'vi', 'vii', 'viii', 'ix', 'xi', 'xii', 'xiii', 
     '_________________', '______________________', 'goodrich', 'american', 
     'whom', 'corporation', 'company' ]
 
-
 a = Alignment(AgreementClassifier.CONVERTIBLE_AGREEMENT, stop_words=my_stops)
 testset = [
     "The interest rate is 11%% and growing",
-    "The principal amount of the loan is $10,000."
+    "The principal amount of the note is $10,000, purchased herein."
 ]
 a.align(testset)
