@@ -1,10 +1,26 @@
-README
+# README
 
-identification.py : will be responsible for classifying or categorizing a WHOLE agreement.  
-For example, the identification module will return a result for what type of agreement is 
-being reviewed.
+##About this package
 
-alignment.py : will be responsible for classifying or categorizing the provisions WITHIN
+This package contains a directory and several python source files.
+
+The train/ directory contains a set of files that each corresponds to one kind 
+of common legal provision.  For example, train/train_interest_rate contains the 
+text from several variations of provisions in legal agreements that can help 
+identify the "Interest Rate" provision.   
+
+##Source Code
+
+###identification.py 
+
+The identification module contains the Agreement and AgreementClassifier classes, 
+responsible for classifying or categorizing a WHOLE agreement.  For example, the 
+identification module will return a result for what type of agreement is being 
+analyzed.
+
+###alignment.py 
+
+The alignment module is responsible for classifying or categorizing the provisions WITHIN
 an agreement.  
 
 
