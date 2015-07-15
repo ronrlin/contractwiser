@@ -23,12 +23,12 @@ analyzed.
 The alignment module is responsible for classifying or categorizing the provisions WITHIN
 an agreement.  
 
+###test.py
 
+This is a procedural file that is being used to test different classification approaches,
+the nltk corpus loaders, and other odds and ends.
 
-
-
-
-
+## More stuff
 
 This is just junk to store for later.
 
