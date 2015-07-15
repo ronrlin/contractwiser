@@ -1,59 +1,84 @@
+#!/usr/bin/python
+from sklearn.feature_extraction.text import CountVectorizer
+from nltk.corpus.reader.plaintext import PlaintextCorpusReader
+from sklearn import svm
 
-def credit_agreement_struct():
-    struct = list()
-    struct.append('Principal Amount of Loan')
-    struct.append('Maturity Date')
-    struct.append('Interest Rate')
-    struct.append('Conversion to Equity')
-    struct.append('Conversion Rate')
-    struct.append('Conversion Share Types')
-    struct.append('Dilution')
-    struct.append('Change in Control')
-    struct.append('Acquisition')
-    struct.append('Liquidation')
-    struct.append('Merger')
-    struct.append('Sale of Assets')
-    struct.append('IPO')
-    struct.append('Events of Default')
-    struct.append('Events of Termination')
-    struct.append('Prepayment or Make Whole')
-    struct.append('Default Interest Rate')
-    struct.append('Rights and Remedies for Default')
-    struct.append('Payment of Principal')
-    struct.append('Payment of Accrued Interest')
-    struct.append('Grace Period')
-    struct.append('Threshold for Enforcement')
-    struct.append('Representations and Warranties of the Company')
-    struct.append('Organization')
-    struct.append('Good Standing')
-    struct.append('No Default')
-    struct.append('Charter and Loan Documents')
-    struct.append('Organizational Documents')
-    struct.append('Corporate Authorization')
-    struct.append('Enforceability')
-    struct.append('Disclosure of Indebtedness')
-    struct.append('Representations and Warranties of the Buyer')
-    struct.append('Security Laws Compliance')
-    struct.append('Sophistication and Investment Experience')
-    struct.append('Qualified Institutional Buyer')
-    struct.append('Accredited Investor')
-    struct.append('Financial Wherewithal')
-    struct.append('Authorization')
-    struct.append('Purchase for Own Account')
-    struct.append('Information Rights')
-    struct.append('Notices and Notification')
-    struct.append('Governing Law and Jurisdiction')
-    struct.append('Restricted Securities')
-    struct.append('Registration')
-    struct.append('Assignment and Successor Rights')
-    struct.append('Amendment or Modification Rights')
-    struct.append('Collection Costs')
-    struct.append('Subsequent Sale of Notes')
-    struct.append('Use of Proceeds')
-    struct.append('Severability')
-    struct.append('Waiver of Jury Trial')
-    struct.append('Arbitration')
-    return struct
+import os
+from identification import AgreementClassifier
 
-def aligner():
-    return th
+BASE_PATH = "./"
+
+class Alignment(object):
+
+    CLAUSE_TYPE = {
+        'interest_rate' : 'train/train_interest_rate',
+        'principal_amount' : 'train/train_principal_amount',
+        'notices' : 'train/train_notices_and_notifications',
+        'registration_rights' : 'train/train_registration_rights',
+    } 
+
+    """
+    Alignment 
+
+    Attributes:
+    """
+    def __init__(self, atype, stop_words=None):
+        self.type = atype
+        self.training_corpus = PlaintextCorpusReader(BASE_PATH, list(self.CLAUSE_TYPE.values()))
+        print('Training files loaded...')
+        print(self.training_corpus.fileids())
+        print(len(self.training_corpus.fileids()))
+        self.vectorizer = CountVectorizer(input='content', stop_words=stop_words, ngram_range=(1,1))
+        train_sents = list(' '.join(s) for s in self.training_corpus.sents())
+        train_vec = self.vectorizer.fit_transform(train_sents)
+
+        target = list()
+        print(self.training_corpus.fileids())
+        for tfile in self.training_corpus.fileids():
+            for tpara in self.training_corpus.sents(tfile):  
+                target.append(tfile)
+
+        self.cll = svm.LinearSVC(class_weight='auto')
+        self.cll.fit(train_vec, target)
+        print("fitted and ready.")
+
+    """
+    Function aligns or classifies sentences passed to the function.
+
+    Parameters:
+
+    content : list of strings
+
+    """
+    def align(self, content):
+        test_vec = self.vectorizer.transform(content)
+        results = self.cll.predict(test_vec)
+        print(results)
+        return results
+
+    """
+    markup() returns content with markup to identify provisions within agreement
+    """
+    def get_markup(self):
+        return self._content
+
+"""
+Code below runs tests.
+"""
+
+my_stops = [ 'ii', 'iii', 'iv', 'vi', 'vii', 'viii', 'ix', 'xi', 'xii', 'xiii', 'january', 
+    'february', 'march', 'april', 'may', 'june', 'july', 'august', 
+    'september', 'october', 'november', 'december', '00', '000', '10', 
+    '11', '12', '13', '14', '15', '16', '17', '18', '180', '19', '1933', 
+    '1996', '20', '2001', '2002', '2003', '2004', '2009', '2006', '21', '25', 
+    '250', '30', '31', '360', '365', '50', '500', '60', '90', '_________', 
+    '_________________', '______________________', 'goodrich', 'american', 
+    'whom', 'corporation', 'company' ]
+
+
+a = Alignment(AgreementClassifier.CONVERTIBLE_AGREEMENT, stop_words=my_stops)
+testset = [
+    "The interest rate is 11%% and growing",
+    "The principal amount of the loan is $10,000."
+]
+a.align(testset)

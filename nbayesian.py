@@ -46,7 +46,11 @@ strip_chars = '*_-. '
 # Remove Stopwords
 # prepare stopword list.  problem is the default removes stopwords I want to keep
 # keep 'not'
+
+from nltk.corpus import stopwords
+
 #stops = set(stopwords.words("english"))
+#words = [words for words in catcorpus.words()]
 #filtered_words = [word for word in word_list if word not in stops]
 
 # TODO: Remove numbers, non-dictionary characters, 
