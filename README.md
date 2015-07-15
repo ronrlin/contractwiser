@@ -1,5 +1,11 @@
 README
 
+identification.py : will be responsible for classifying or categorizing a WHOLE agreement.  
+For example, the identification module will return a result for what type of agreement is 
+being reviewed.
+
+alignment.py : will be responsible for classifying or categorizing the provisions WITHIN
+an agreement.  
 
 
 
@@ -8,6 +14,7 @@ README
 
 
 
+This is just junk to store for later.
 
 def credit_agreement_struct():
     struct = list()
