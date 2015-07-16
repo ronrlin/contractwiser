@@ -3,6 +3,7 @@ import os
 import numpy as np
 from sklearn import svm
 from nltk.corpus.reader.plaintext import PlaintextCorpusReader
+from sklearn.feature_extraction.text import CountVectorizer
 
 BASE_PATH = "./"
 CORPUS_PATH = os.path.join(BASE_PATH, "small-data/")
@@ -38,7 +39,7 @@ class AgreementClassifier(object):
 	def __init__(self):
 		from os import listdir
 		fileids = listdir(CORPUS_PATH)
-		fileids = fileids[0:2]
+		fileids = fileids
 		print(fileids)
 		self.corpus = PlaintextCorpusReader(CORPUS_PATH, fileids)
 		print('corpus loaded..')
@@ -87,6 +88,7 @@ print(r)
 r = a.classify_file("data/8bdba28656fc9f92e5ff132f1c39bc85c28de36e8995cd8a958ceb5a184b05d6")
 print(r)
 
+from os import listdir
 fileids = listdir(CORPUS_PATH)
 for fs in fileids:
 	print(a.classify_file(CORPUS_PATH + fs))
