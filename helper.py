@@ -8,15 +8,17 @@ collection = db['classified']
 
 import csv
 agreements = list()
-agree = dict()
 
 # this file is not stored in github
 with open('./archive/classify-temp.csv', 'r') as csvfile:
    spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
    for row in spamreader:
+      agree = {}
       agree['filename'] = row[0]
       agree['category'] = row[1] 
       agreements.append(agree)
+      print(row)
+      print('--')
 
 """
 agreements = [

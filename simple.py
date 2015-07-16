@@ -14,6 +14,14 @@ train_sentences = ['The dog goes to the park.',
 	'The cat is so cute.',
 	]
 
+train_sentences = ['The', 'dog', 'goes', 'to', 'the', 'park.']
+#	'The cat is a miserable animal in the park.',
+#	'The dog barks and is happy.',
+#	'Cats have claws.',
+#	'The cat is so cute.',
+#	]
+
+
 target = ['dog', 'cat', 'dog', 'cat', 'cat']
 
 from sklearn.feature_extraction.text import CountVectorizer

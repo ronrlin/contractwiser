@@ -151,3 +151,17 @@ def classify_paragraph(para):
 	return r
 
 
+TEST_PATH = os.path.join(BASE_PATH, "small-data/")
+test_corpus = PlaintextCorpusReader(TEST_PATH, conv_fileids)
+
+print('Test files loaded...')
+print(len(test_corpus.fileids()))
+
+# Flatten the sentences from the test set into a list of strings
+fileid = conv_fileids[2]
+print('File read: ' + fileid)
+t = ' '.join(test_corpus.words(fileid))
+l = list()
+l.append(t)
+
+d = contentvec.fit_transform(l)
