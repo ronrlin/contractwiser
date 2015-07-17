@@ -8,54 +8,31 @@ from sklearn.feature_extraction.text import CountVectorizer
 BASE_PATH = "./"
 CORPUS_PATH = os.path.join(BASE_PATH, "small-data/")
 
-def bootstrap_data(query):
-	from pymongo import MongoClient
-	client = MongoClient('localhost', 27017)
-	db = client['wiser_db']
-	collection = db['classified']
-	result = collection.find_one({'filename' : query})
-	if (result is not None):
-		return result
-	else:
-		return None
-
 class AgreementClassifier(object):
-	"""Agreement Classifier
-
-	Attributes:
-		content: The unicode text of any legal agreement or contract.
-		type: The human readable type of the legal agreement provided.
 	"""
+	Agreement Classifier
 
-	def __init__(self):
-		from os import listdir
-		fileids = listdir(CORPUS_PATH)
-		fileids = fileids
-		print(fileids)
+	Parameters
+	----------
+		fileids : list of filenames
+
+		target : list of categories corresponding to the filenames
+
+	"""
+	def __init__(self, fileids=[], target=[]):
 		self.corpus = PlaintextCorpusReader(CORPUS_PATH, fileids)
-		print('corpus loaded..')
-		print(len(self.corpus.fileids()))
+		print("corpus loaded files: " + str(len(self.corpus.fileids())))
 		self.vectorizer = CountVectorizer(input='content', stop_words=None, ngram_range=(1,2))
-
-		train_vec = np.array([])
-		target = list()
-
 		textcomp = []
 		for thisfile in self.corpus.fileids():
 			text = self.corpus.words(thisfile)
 			text = ' '.join(text)
 			textcomp.append(text)
-			result = bootstrap_data(thisfile)
-			if (result is not None):
-				target.append(result['category'])
-			else:
-				print(thisfile + " not found!")
-				target.append('UNKNOWN')
 
 		train_vec = self.vectorizer.fit_transform(textcomp)
 		self.cll = svm.LinearSVC(class_weight='auto')
 		self.cll.fit(train_vec, target)
-		print("fitted and ready.")
+		print("fitted and ready!")
 
 	def classify_file(self, filename):
 		print('file read: ' + filename)
@@ -72,17 +49,29 @@ class AgreementClassifier(object):
 		}
 		return stats
 
+print("--------------------------------------------")
 print("welcome to a program to id legal agreements.")
-a = AgreementClassifier()
-r = a.classify_file("data/a28b2f92979d4ac8ae1e31e7d1a91e8c9145074105d1254ea24565cb40c0328e")
-print(r)
-r = a.classify_file("data/8bdba28656fc9f92e5ff132f1c39bc85c28de36e8995cd8a958ceb5a184b05d6")
-print(r)
 
-from os import listdir
-fileids = listdir(CORPUS_PATH)
-for fs in fileids:
-	print(a.classify_file(CORPUS_PATH + fs))
+from helper import WiserDatabase
+wd = WiserDatabase()
+
+fileids = list()
+cats = list()
+# capture the list of all agreement types
+categories = wd.get_category_names()
+for category in categories:
+	results = wd.fetch_by_category(category)
+	for r in results:
+		if r is not None:
+			fileids.append(r['filename'])
+			cats.append(r['category'])
+	
+print("number of files: " + str(len(fileids)))
+print("number of categories: " + str(len(cats)))
+
+a = AgreementClassifier(fileids=fileids, target=cats)
+print(a.classify_file("data/a28b2f92979d4ac8ae1e31e7d1a91e8c9145074105d1254ea24565cb40c0328e"))
+print(a.classify_file("data/8bdba28656fc9f92e5ff132f1c39bc85c28de36e8995cd8a958ceb5a184b05d6"))
 
 print("end of program")
-
+print("--------------------------------------------")
