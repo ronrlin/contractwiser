@@ -26,15 +26,6 @@ class AgreementClassifier(object):
 		content: The unicode text of any legal agreement or contract.
 		type: The human readable type of the legal agreement provided.
 	"""
-	UNKNOWN = 0
-	CONVERTIBLE_AGREEMENT = 1
-	CREDIT_AGREEMENT = 2
-
-	TYPES = {
-		UNKNOWN: 'unknown',
-		CONVERTIBLE_AGREEMENT: 'convertible_debt',
-		CREDIT_AGREEMENT: 'credit_agreement',
-	}
 
 	def __init__(self):
 		from os import listdir
@@ -67,7 +58,7 @@ class AgreementClassifier(object):
 		print("fitted and ready.")
 
 	def classify_file(self, filename):
-		print('File read: ' + filename)
+		print('file read: ' + filename)
 		fh = open(filename, 'r')
 		x = fh.read()
 		fh.close()

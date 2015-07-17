@@ -150,3 +150,5 @@ def classify_paragraph(para):
 		print(train_files[i])
 	return r
 
+from helper import WiserDatabase
+w = WiserDatabase()
