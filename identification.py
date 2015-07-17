@@ -14,9 +14,10 @@ class AgreementClassifier(object):
 
 	Parameters
 	----------
-		fileids : list of filenames
+		fileids : list of filenames to build a training corpus from
 
-		target : list of categories corresponding to the filenames
+		target : list of categories corresponding to the filenames from which 
+			to build a training corpus
 
 	"""
 	def __init__(self, fileids=[], target=[]):
@@ -34,6 +35,14 @@ class AgreementClassifier(object):
 		self.cll.fit(train_vec, target)
 		print("fitted and ready!")
 
+	"""
+	Parameters
+	----------
+		filename : relative path to a file with filename
+
+		return a list containing a string corresponding to the predicted category of filename.
+
+	"""
 	def classify_file(self, filename):
 		print('file read: ' + filename)
 		fh = open(filename, 'r')
@@ -43,6 +52,8 @@ class AgreementClassifier(object):
 		results = self.cll.predict(dtm_test)
 		return results
 
+	"""
+	"""
 	def get_stats(self):
 		stats = {
 			'sentence_count' : 0,

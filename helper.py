@@ -47,6 +47,9 @@ def create_db():
    print(len(result.inserted_ids))
    client.close()
 
+"""
+
+"""
 class WiserDatabase(object):
    def __init__(self):
       self.client = MongoClient('localhost', 27017)

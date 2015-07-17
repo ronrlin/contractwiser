@@ -8,6 +8,12 @@ from identification import AgreementClassifier
 
 BASE_PATH = "./"
 
+"""
+Alignment describes the process by which agreements of the same kind of are compared
+to one another in a way that "aligns" the provisions within them.  Aligning agreements
+is critical to being able to calculate relatively frequency of certain provisions.  
+
+"""
 class Alignment(object):
 
     CLAUSE_TYPE = {
@@ -18,42 +24,38 @@ class Alignment(object):
     } 
 
     """
-    Alignment 
+    Alignment is the proces
 
     Attributes:
     """
-    def __init__(self, atype, stop_words=None):
-        self.type = atype
+    def __init__(self, stop_words=None):
         self.training_corpus = PlaintextCorpusReader(BASE_PATH, list(self.CLAUSE_TYPE.values()))
-        print('Training files loaded...')
+        print('training files loaded...' + str(len(self.training_corpus.fileids())))
         print(self.training_corpus.fileids())
-        print(len(self.training_corpus.fileids()))
         self.vectorizer = CountVectorizer(input='content', stop_words=stop_words, ngram_range=(1,1))
         train_sents = list(' '.join(s) for s in self.training_corpus.sents())
         train_vec = self.vectorizer.fit_transform(train_sents)
 
         target = list()
-        print(self.training_corpus.fileids())
         for tfile in self.training_corpus.fileids():
             for tpara in self.training_corpus.sents(tfile):  
                 target.append(tfile)
 
         self.cll = svm.LinearSVC(class_weight='auto')
         self.cll.fit(train_vec, target)
-        print("fitted and ready.")
+        print("ready for alignment.")
 
     """
     Function aligns or classifies sentences passed to the function.
 
-    Parameters:
-
-    content : list of strings
+    Parameters
+    ----------
+    content : a list of strings
 
     """
     def align(self, content):
         test_vec = self.vectorizer.transform(content)
         results = self.cll.predict(test_vec)
-        print(results)
         return results
 
     """
@@ -77,7 +79,7 @@ my_stops = [ 'ii', 'iii', 'iv', 'vi', 'vii', 'viii', 'ix', 'xi', 'xii', 'xiii', 
     '_________________', '______________________', 'goodrich', 'american', 
     'whom', 'corporation', 'company' ]
 
-a = Alignment(AgreementClassifier.CONVERTIBLE_AGREEMENT, stop_words=my_stops)
+a = Alignment(stop_words=my_stops)
 testset = [
     "The interest rate is 11%% and growing",
     "The principal amount of the note is $10,000, purchased herein."
