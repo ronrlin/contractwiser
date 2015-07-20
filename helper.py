@@ -13,6 +13,9 @@ def clear_db():
    client.close()
 
 """
+TODO: Create a unique index on 'filename'.
+TODO: Check for exceptions in the case that uniqueness is broken
+
 agreements = [
    {
       'filename' : '891daf5deebf3e31b7bb1c2970ac1c507d50818aa4db2dfd0b7e9b344a340202',
@@ -30,6 +33,7 @@ def create_db():
    print("created wiser_db...")
    collection = db['classified']
    print("created 'classified' collection...")
+   collection.createIndex( { 'filename': "hashed" } )
    import csv
    agreements = list()
 
@@ -84,10 +88,18 @@ class WiserDatabase(object):
 
    """
    Returns a list of the 'category' names.  Categories are different names for 
-   the agreements in the ContractWiser repository.
+   the agreements in the ContractWiser repository.  Examples include 'CONVERTIBLE'
+   for Convertible Note agreements, etc...
 
    returns a list
    """
    def get_category_names(self):
       return self.collection.distinct("category")
 
+   """
+   """
+   def add_record(self, filename, category):
+      new_record = { 'filename' : filename, 'category' : category }
+      result = self.collection.insert_one(new_record)
+      print("one (1) new record created: " + result.inserted_id)
+      return result.inserted_id

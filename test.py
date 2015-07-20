@@ -21,12 +21,14 @@ BASE_PATH = "/home/obironkenobi/Projects/ContractWiser/"
 # train_notices_and_notifications.txt
 # train_registration_rights.txt
 
-train_files = [ 'train/train_interest_rate',
+train_files = [ 
+	'train/train_interest_rate',
 	'train/train_principal_amount',
 	'train/train_notices_and_notifications',
 	'train/train_registration_rights',
 	'train/train_prepayment',
-	'train/train_events_of_default']
+	'train/train_events_of_default'
+]
 
 # Read in a corpus from the train/ path
 from nltk.corpus.reader.plaintext import PlaintextCorpusReader

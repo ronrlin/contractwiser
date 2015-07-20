@@ -24,7 +24,7 @@ class Alignment(object):
     } 
 
     """
-    Alignment is the proces
+    Constructor
 
     Attributes:
     """
@@ -59,7 +59,7 @@ class Alignment(object):
         return results
 
     """
-    markup() returns content with markup to identify provisions within agreement
+    Returns content with markup to identify provisions within agreement
     """
     def get_markup(self):
         return self._content
