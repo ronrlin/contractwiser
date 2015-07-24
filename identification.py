@@ -14,10 +14,10 @@ class AgreementClassifier(object):
 
 	Parameters
 	----------
-		fileids : list of filenames to build a training corpus from
+		fileids : list of filenames from which to build a training corpus.
 
 		target : list of categories corresponding to the filenames from which 
-			to build a training corpus
+			to build a training corpus.
 
 	"""
 	def __init__(self, fileids=[], target=[]):
@@ -54,9 +54,17 @@ class AgreementClassifier(object):
 		return results
 
 	"""
-	A function that figures out who the party and counter parties are in an agreement.
+	A function that figures out who the party and counterparties are in an agreement.
 	"""
-	def id_party_counterparty():
+	def id_party_counterparty(self):
+		pass
+
+	"""
+	A function that determines the geospatial coordinates relevant to this agreement,
+	usually a US state.  This is usually determined from the Governing Law and Jurisdiction
+	provision.
+	"""
+	def determine_geography(self):
 		pass
 
 	"""
@@ -105,6 +113,7 @@ def binary_search(search_target='CONVERTIBLE'):
 				cats.append("OTHER")
 
 	classifier = AgreementClassifier(fileids=fileids, target=cats)
+	return classifier
 	# check how many CONVERTIBLE DEBT agreements there are	
 	# go into the data/ directory
 	# grab a huge list of files
@@ -169,6 +178,18 @@ def main():
 
 	print("end of program")
 	print("--------------------------------------------")
+
+def convertible_sampler():
+	classifier = binary_search('CONVERTIBLE')
+	data_path = os.path.join(BASE_PATH, "data/")
+	filenames = os.listdir(data_path)
+	ctype_filenames = []
+	print("preparing to scan " + str(len(filenames)) + " files")
+	for f in filenames:
+		ftype = classifier.classify_file(os.path.join(data_path, f))
+		if (ftype == 'CONVERTIBLE'):
+			ctype_filenames.append(ftype)
+	return ctype_filenames
 
 """
 """

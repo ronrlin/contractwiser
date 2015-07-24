@@ -7,14 +7,15 @@ import numpy as np
 
 from sklearn import cross_validation
 
-train_sentences = ['The dog goes to the park.',
+train_sentences = [
+	'The dog goes to the park.',
 	'The cat is a miserable animal in the park.',
 	'The dog barks and is happy.',
 	'Cats have claws.',
 	'The cat is so cute.',
-	]
+]
 
-train_sentences = ['The', 'dog', 'goes', 'to', 'the', 'park.']
+#train_sentences = ['The', 'dog', 'goes', 'to', 'the', 'park.']
 #	'The cat is a miserable animal in the park.',
 #	'The dog barks and is happy.',
 #	'Cats have claws.',

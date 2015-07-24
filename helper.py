@@ -14,7 +14,8 @@ def clear_db():
 
 """
 TODO: Create a unique index on 'filename'.
-TODO: Check for exceptions in the case that uniqueness is broken
+TODO: Check for exceptions in the case that uniqueness is broken.
+TODO: Consider more robust exception handling.
 
 agreements = [
    {
