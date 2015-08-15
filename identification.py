@@ -45,13 +45,12 @@ class AgreementClassifier(object):
 
 	"""
 	def classify_file(self, filename):
-		print('file read: ' + filename)
 		fh = open(filename, 'r')
 		x = fh.read()
 		fh.close()
 		dtm_test = self.vectorizer.transform([x])
 		results = self.cll.predict(dtm_test)
-		return results
+		return results[0]
 
 	"""
 	A function that figures out who the party and counterparties are in an agreement.
@@ -179,16 +178,30 @@ def main():
 	print("end of program")
 	print("--------------------------------------------")
 
-def convertible_sampler():
+"""
+Uses a Binary classifier to compare CONVERTIBLE vs. any other agreements.
+Looks in the data/ directory and determines if agreements are CONVERTIBLE
+or OTHER.  
+
+return the classifier?
+
+returns a list of filenames that are CONVERTIBLE
+"""
+def convertible_sampler(limit=(0, 1000)):
+	# binary classifier that looks for CONVERTIBLE docs
 	classifier = binary_search('CONVERTIBLE')
+	# look for test data set in the data/ directory
 	data_path = os.path.join(BASE_PATH, "data/")
 	filenames = os.listdir(data_path)
 	ctype_filenames = []
 	print("preparing to scan " + str(len(filenames)) + " files")
+
+	filenames = filenames[limit[0]:limit[1]]
+
 	for f in filenames:
 		ftype = classifier.classify_file(os.path.join(data_path, f))
 		if (ftype == 'CONVERTIBLE'):
-			ctype_filenames.append(ftype)
+			ctype_filenames.append(f)
 	return ctype_filenames
 
 """
