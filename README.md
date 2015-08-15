@@ -9,6 +9,16 @@ of common legal provision.  For example, train/train_interest_rate contains the
 text from several variations of provisions in legal agreements that can help 
 identify the "Interest Rate" provision.   
 
+##Requirements
+
+Python 3.4.x+
+NLTK 3.0
+Numpy
+Scipy
+Scikit-Learn
+
+##Installation
+
 ##Source Code
 
 ###identification.py 
