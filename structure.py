@@ -14,6 +14,7 @@ class AgreementSchema(object):
 		pass
 
 	"""	
+	Loads schema information from schema/*.ini. 
 	"""
 	def load_schema(self, schema_type):
 		config = configparser.ConfigParser()
@@ -56,6 +57,8 @@ class AgreementSchema(object):
 init loads schema definitions into files.
 """
 def init(): 
+	# ##################################
+	# Create the convertible debt schema
 	config = configparser.ConfigParser()
 	config['general'] = {
 		'agreement_type': 'convertible_debt',
@@ -71,7 +74,6 @@ def init():
 		'registration_rights': 'train/train_registration_rights',
 	}
 
-
 	config['concepts'] = {
 		'interest_rate'	: 'interest_rate',
 		'recitals' : 'interest_rate, maturity_date',
@@ -80,6 +82,7 @@ def init():
 
 	with open(SCHEMA_PATH + 'convertible_debt.ini', 'w') as configfile:
 		config.write(configfile)
+	# ##################################
 
 def main():
 	pass
