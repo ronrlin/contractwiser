@@ -23,6 +23,7 @@ train_sentences = [
 #	]
 
 
+
 target = ['dog', 'cat', 'dog', 'cat', 'cat']
 
 from sklearn.feature_extraction.text import CountVectorizer
@@ -62,4 +63,8 @@ cld = SGDClassifier(n_iter=100, alpha=0.01)
 cld.fit(dtm, target)
 sdgresults = cld.predict(dtm_test)
 
+from sklearn.linear_model import SGDClassifier
+cld = SGDClassifier(n_iter=100, alpha=0.01)
+cld.fit(dtm, target)
+sdgresults = cld.predict(dtm_test)
 

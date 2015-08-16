@@ -21,19 +21,45 @@ class AgreementClassifier(object):
 
 	"""
 	def __init__(self, fileids=[], target=[]):
+		import time
+		start_time = time.time()
 		self.corpus = PlaintextCorpusReader(CORPUS_PATH, fileids)
-		print("corpus loaded files: " + str(len(self.corpus.fileids())))
+		end_time = time.time()
+		print("Corpus is loading %s files" % str(len(self.corpus.fileids())))
+		print("Time to load Plaintext corpus is %s seconds" % (end_time - start_time))
+
+		start_time = time.time()
 		self.vectorizer = CountVectorizer(input='content', stop_words=None, ngram_range=(1,2))
+		end_time = time.time()
+		print("Time to vectorize is %s seconds" % (end_time-start_time))
+
+		start_time = time.time()
 		textcomp = []
 		for thisfile in self.corpus.fileids():
 			text = self.corpus.words(thisfile)
 			text = ' '.join(text)
 			textcomp.append(text)
+		end_time = time.time()
+		print("Time to scroll through all fileids is %s seconds" % (end_time-start_time))
 
+		start_time = time.time()
 		train_vec = self.vectorizer.fit_transform(textcomp)
+		end_time = time.time()
+		print("Time to fit/transform matrix set is %s seconds" % (end_time-start_time))
+
+		# Try to just do a transform
+		start_time = time.time()
+		train_vec2 = self.vectorizer.transform(textcomp)
+		end_time = time.time()
+		print("Time to transform matrix set is %s seconds" % (end_time-start_time))
+
+		start_time = time.time()
 		self.cll = svm.LinearSVC(class_weight='auto')
 		self.cll.fit(train_vec, target)
-		print("fitted and ready!")
+		end_time = time.time()
+		print("Time to fit model is %s seconds" % (end_time-start_time))
+
+		print("Fitted and ready!")
 
 	"""
 	Parameters
@@ -138,12 +164,15 @@ def main():
 			if r is not None:
 				fileids.append(r['filename'])
 				cats.append(r['category'])
-		
+
+	fileids = fileids[0:50]
+	cats = cats[0:50]
 	print("number of files: " + str(len(fileids)))
 	print("number of categories: " + str(len(cats)))
 	print("number of distinct categories: " + str(len(list(set(cats)))))
 
 	a = AgreementClassifier(fileids=fileids, target=cats)
+
 	print(a.classify_file("data/a28b2f92979d4ac8ae1e31e7d1a91e8c9145074105d1254ea24565cb40c0328e"))
 	print(a.classify_file("data/8bdba28656fc9f92e5ff132f1c39bc85c28de36e8995cd8a958ceb5a184b05d6"))
 	print(a.classify_file("data/b59ae6f6b7ff76061a1e08b5090ff40068b8e8e396051cb10e12cc231a6ff652"))
@@ -207,4 +236,4 @@ def convertible_sampler(limit=(0, 1000)):
 """
 """
 if __name__ == "__main__":
-    main()
+    pass
