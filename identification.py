@@ -33,14 +33,25 @@ class AgreementClassifier(object):
 		end_time = time.time()
 		print("Time to vectorize is %s seconds" % (end_time-start_time))
 
+		#start_time = time.time()
+		#textcomp = []
+		#for thisfile in self.corpus.fileids():
+		#	text = self.corpus.words(thisfile)
+		#	text = ' '.join(text)
+		#	textcomp.append(text)
+		#end_time = time.time()
+		#print("Time to scroll through all fileids is %s seconds" % (end_time-start_time))
+
 		start_time = time.time()
-		textcomp = []
+		textcomp2 = []
 		for thisfile in self.corpus.fileids():
-			text = self.corpus.words(thisfile)
-			text = ' '.join(text)
-			textcomp.append(text)
+			text = self.corpus.raw(thisfile)
+			text = ' '.join([text])
+			textcomp2.append(text)
 		end_time = time.time()
-		print("Time to scroll through all fileids is %s seconds" % (end_time-start_time))
+		textcomp=textcomp2
+		#print(textcomp2)
+		print("Time to scroll through all raw fileids is %s seconds" % (end_time-start_time))
 
 		start_time = time.time()
 		train_vec = self.vectorizer.fit_transform(textcomp)
