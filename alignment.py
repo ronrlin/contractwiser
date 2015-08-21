@@ -6,6 +6,7 @@ from sklearn import svm
 
 import os
 from identification import AgreementClassifier
+from structure import AgreementSchema
 
 BASE_PATH = "./"
 COUNT_VECT = 1
@@ -29,12 +30,20 @@ class Alignment(object):
     """
     Constructor
 
-    Attributes:
+    :param schema: specify the AgremeentSchema to use for alignment.
+    :param vectorizer: specify the type of vectorization method.
+    :param stop_words: specify stop words to drop from texts.
+
     """
-    def __init__(self, vectorizer=COUNT_VECT, stop_words=None):
+    def __init__(self, schema=None, vectorizer=COUNT_VECT, stop_words=None):
+        print("Load %s agreement training provisions" % schema.get_agreement_type())
+        provisions_reqd = schema.get_provisions()
+        # provisions_reqd is a tuple (provision_name, provision_path)
+        training_file_names = [p[1] for p in provisions_reqd]
+
         import time
         start_time = time.time()
-        self.training_corpus = PlaintextCorpusReader(BASE_PATH, list(self.CLAUSE_TYPE.values()))
+        self.training_corpus = PlaintextCorpusReader(BASE_PATH, training_file_names)
         end_time = time.time()
         print("Corpus is loading %s files" % str(len(self.training_corpus.fileids())))
         print("Time to load Plaintext corpus is %s seconds" % (end_time - start_time))
@@ -94,6 +103,10 @@ class Alignment(object):
 Code is an example.
 """
 def example():
+
+    convertible_schema = AgreementSchema()
+    convertible_schema.load_schema("convertible_debt.ini")
+
     # This is my arbitrary list of stopwords that I noticed were in features.
     # TODO: consider using regex to eliminate numbers and certain words?
     my_stops = [ 'ii', 'iii', 'iv', 'vi', 'vii', 'viii', 'ix', 'xi', 'xii', 'xiii', 'january', 
@@ -105,7 +118,7 @@ def example():
         '_________________', '______________________', 'goodrich', 'american', 
         'whom', 'corporation', 'company' ]
 
-    a = Alignment(stop_words=my_stops)
+    a = Alignment(schema=convertible_schema, stop_words=my_stops)
     testset = [
         "The interest rate is 11%% and growing in New York City",
         "The principal amount of the note is $10,000, purchased herein."
