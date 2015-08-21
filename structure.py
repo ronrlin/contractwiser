@@ -15,6 +15,8 @@ class AgreementSchema(object):
 
 	"""	
 	Loads schema information from schema/*.ini. 
+
+	:param schema_type: the schema to load, ie: "convertible_debt.ini"
 	"""
 	def load_schema(self, schema_type):
 		config = configparser.ConfigParser()
@@ -28,7 +30,7 @@ class AgreementSchema(object):
 	"""
 	Returns a list of tuples which contain (name, path_to_training_file).  The 
 	name corresponds to the name of a provision.  The path_to_training_file is
-	a used for bootstrapping the provision classifier.  	
+	a used for bootstrapping the provision classifier. 
 	"""
 	def get_provisions(self):
 		return self.provisions
@@ -66,7 +68,6 @@ def init():
 	}
 
 	config['provisions'] = {
-		'recitals': 'train/train_recitals',
 		'severability': 'train/train_severability',
 		'interest_rate': 'train/train_interest_rate',
 		'principal_amount': 'train/train_principal_amount',
