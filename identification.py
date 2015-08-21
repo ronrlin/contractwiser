@@ -4,9 +4,13 @@ import numpy as np
 from sklearn import svm
 from nltk.corpus.reader.plaintext import PlaintextCorpusReader
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 BASE_PATH = "./"
 CORPUS_PATH = os.path.join(BASE_PATH, "small-data/")
+
+COUNT_VECT = 1
+TFIDF_VECT = 2
 
 class AgreementClassifier(object):
 	"""
@@ -20,7 +24,7 @@ class AgreementClassifier(object):
 			to build a training corpus.
 
 	"""
-	def __init__(self, fileids=[], target=[]):
+	def __init__(self, vectorizer=COUNT_VECT, fileids=[], target=[]):
 		import time
 		start_time = time.time()
 		self.corpus = PlaintextCorpusReader(CORPUS_PATH, fileids)
@@ -29,18 +33,14 @@ class AgreementClassifier(object):
 		print("Time to load Plaintext corpus is %s seconds" % (end_time - start_time))
 
 		start_time = time.time()
-		self.vectorizer = CountVectorizer(input='content', stop_words=None, ngram_range=(1,2))
+		self.vector_type = vectorizer
+		if (vectorizer == COUNT_VECT): 
+			self.vectorizer = CountVectorizer(input='content', stop_words=None, ngram_range=(1,2))
+		elif (vectorizer == TFIDF_VECT):
+			self.vectorizer = TfidfVectorizer(input='content', stop_words=None, ngram_range=(1,2))
+
 		end_time = time.time()
 		print("Time to vectorize is %s seconds" % (end_time-start_time))
-
-		#start_time = time.time()
-		#textcomp = []
-		#for thisfile in self.corpus.fileids():
-		#	text = self.corpus.words(thisfile)
-		#	text = ' '.join(text)
-		#	textcomp.append(text)
-		#end_time = time.time()
-		#print("Time to scroll through all fileids is %s seconds" % (end_time-start_time))
 
 		start_time = time.time()
 		textcomp2 = []
@@ -50,7 +50,6 @@ class AgreementClassifier(object):
 			textcomp2.append(text)
 		end_time = time.time()
 		textcomp=textcomp2
-		#print(textcomp2)
 		print("Time to scroll through all raw fileids is %s seconds" % (end_time-start_time))
 
 		start_time = time.time()
@@ -72,16 +71,16 @@ class AgreementClassifier(object):
 
 		print("Fitted and ready!")
 
-	"""
-	Parameters
-	----------
-		filename : relative path to a file with filename
-
-		return a list containing a string corresponding to the predicted 
-			category of filename.
-
-	"""
 	def classify_file(self, filename):
+		"""
+		Parameters
+		----------
+			filename : relative path to a file with filename
+
+			return a list containing a string corresponding to the predicted 
+				category of filename.
+
+		"""
 		fh = open(filename, 'r')
 		x = fh.read()
 		fh.close()
@@ -89,41 +88,54 @@ class AgreementClassifier(object):
 		results = self.cll.predict(dtm_test)
 		return results[0]
 
-	"""
-	A function that figures out who the party and counterparties are in an agreement.
-	"""
+	def get_vectorizer_type():
+		""" 
+		Return human-readable vectorization method being used by the classifier. 
+
+		Returns a string
+
+		ie: CountVectorizer, TfidfVectorizer
+		"""
+		if (self.vector_type == COUNT_VECT):
+			return "CountVectorizer"
+		elif (self.vector_type == TFIDF_VECT):
+			return "TfidfVectorizer"
+
 	def id_party_counterparty(self):
+		"""
+		A function that figures out who the party and counterparties are in an agreement.
+		"""
 		pass
 
-	"""
-	A function that determines the geospatial coordinates relevant to this agreement,
-	usually a US state.  This is usually determined from the Governing Law and Jurisdiction
-	provision.
-	"""
 	def determine_geography(self):
+		"""
+		A function that determines the geospatial coordinates relevant to this agreement,
+		usually a US state.  This is usually determined from the Governing Law and Jurisdiction
+		provision.
+		"""
 		pass
 
-	"""
-	"""
 	def get_stats(self):
+		"""
+		"""
 		stats = {
 			'sentence_count' : 0,
 		}
 		return stats
 
-"""
-Function performs a binary search to identify agreements of type 
-specified by search_type.  This classifier works by training on 
-one type of agreement, and treats agreements of any other type as 
-OTHER.  The classifier therefore works by asking if a given
-agreement is of a certain type.  If not, it classifies it generally
-as simply OTHER.
+def binary_search(vectorizer=COUNT_VECT, search_target='CONVERTIBLE'):
+	"""
+	Function performs a binary search to identify agreements of type 
+	specified by search_type.  This classifier works by training on 
+	one type of agreement, and treats agreements of any other type as 
+	OTHER.  The classifier therefore works by asking if a given
+	agreement is of a certain type.  If not, it classifies it generally
+	as simply OTHER.
 
-Parameters
-----------
-search_target : string representing a category of agreements
-"""
-def binary_search(search_target='CONVERTIBLE'):
+	Parameters
+	----------
+	search_target : string representing a category of agreements
+	"""
 	from helper import WiserDatabase
 	wd = WiserDatabase()
 
@@ -148,7 +160,7 @@ def binary_search(search_target='CONVERTIBLE'):
 				fileids.append(r['filename'])
 				cats.append("OTHER")
 
-	classifier = AgreementClassifier(fileids=fileids, target=cats)
+	classifier = AgreementClassifier(vectorizer=vectorizer, fileids=fileids, target=cats)
 	return classifier
 	# check how many CONVERTIBLE DEBT agreements there are	
 	# go into the data/ directory
@@ -156,9 +168,9 @@ def binary_search(search_target='CONVERTIBLE'):
 	# run predict
 	# check manually
 
-"""
-"""
 def main():
+	"""
+	"""
 	print("--------------------------------------------")
 	print("welcome to a program to id legal agreements.")
 
@@ -176,13 +188,13 @@ def main():
 				fileids.append(r['filename'])
 				cats.append(r['category'])
 
-	fileids = fileids[0:50]
-	cats = cats[0:50]
+	fileids = fileids[0:150]
+	cats = cats[0:150]
 	print("number of files: " + str(len(fileids)))
 	print("number of categories: " + str(len(cats)))
 	print("number of distinct categories: " + str(len(list(set(cats)))))
 
-	a = AgreementClassifier(fileids=fileids, target=cats)
+	a = AgreementClassifier(vectorizer=COUNT_VECT, fileids=fileids, target=cats)
 
 	print(a.classify_file("data/a28b2f92979d4ac8ae1e31e7d1a91e8c9145074105d1254ea24565cb40c0328e"))
 	print(a.classify_file("data/8bdba28656fc9f92e5ff132f1c39bc85c28de36e8995cd8a958ceb5a184b05d6"))
@@ -218,31 +230,115 @@ def main():
 	print("end of program")
 	print("--------------------------------------------")
 
-"""
-Uses a Binary classifier to compare CONVERTIBLE vs. any other agreements.
-Looks in the data/ directory and determines if agreements are CONVERTIBLE
-or OTHER.  
+def convertible_sampler(vectorizer=COUNT_VECT, limit=(0, 1000)):
+	"""
+	Uses a Binary classifier to compare CONVERTIBLE vs. any other agreements.
+	Looks in the data/ directory and determines if agreements are CONVERTIBLE
+	or OTHER.  
 
-return the classifier?
+	return the classifier?
 
-returns a list of filenames that are CONVERTIBLE
-"""
-def convertible_sampler(limit=(0, 1000)):
+	returns a list of filenames that are CONVERTIBLE
+	"""
 	# binary classifier that looks for CONVERTIBLE docs
-	classifier = binary_search('CONVERTIBLE')
+	classifier = binary_search(vectorizer=vectorizer, search_target='CONVERTIBLE')
 	# look for test data set in the data/ directory
 	data_path = os.path.join(BASE_PATH, "data/")
 	filenames = os.listdir(data_path)
 	ctype_filenames = []
 	print("preparing to scan " + str(len(filenames)) + " files")
-
 	filenames = filenames[limit[0]:limit[1]]
+	print("trimmed down to " + str(len(filenames)) + " files")
 
 	for f in filenames:
 		ftype = classifier.classify_file(os.path.join(data_path, f))
 		if (ftype == 'CONVERTIBLE'):
 			ctype_filenames.append(f)
 	return ctype_filenames
+
+def testing():
+	"""
+	Test the loading times and vectorization times for CountVectorizer vs. TfidfVectorizer
+	"""
+	print("Measure the CountVectorizer")
+	classifier = binary_search(vectorizer=COUNT_VECT, search_target='CONVERTIBLE')
+	data_path = os.path.join(BASE_PATH, "data/")
+	filenames = os.listdir(data_path)
+	print("preparing to scan " + str(len(filenames)) + " files")
+	filenames = filenames[0:1000]
+	print("trimmed down to " + str(len(filenames)) + " files")
+
+	print("\n\n")
+
+	print("Measure the TfidfVectorizer")
+	classifier = binary_search(vectorizer=TFIDF_VECT, search_target='CONVERTIBLE')
+	data_path = os.path.join(BASE_PATH, "data/")
+	filenames = os.listdir(data_path)
+	print("preparing to scan " + str(len(filenames)) + " files")
+	filenames = filenames[0:1000]
+	print("trimmed down to " + str(len(filenames)) + " files")
+
+"""
+
+Measure the CountVectorizer
+searching for agreements of type CONVERTIBLE
+Corpus is loading 362 files
+Time to load Plaintext corpus is 0.00012111663818359375 seconds
+Time to vectorize is 2.0265579223632812e-05 seconds
+Time to scroll through all raw fileids is 0.10050797462463379 seconds
+Time to fit/transform matrix set is 41.66534876823425 seconds
+Time to transform matrix set is 37.24678039550781 seconds
+Time to fit model is 1.765761137008667 seconds
+Fitted and ready!
+preparing to scan 8189 files
+trimmed down to 100 files
+
+
+
+Measure the TfidfVectorizer
+searching for agreements of type CONVERTIBLE
+Corpus is loading 362 files
+Time to load Plaintext corpus is 0.000110626220703125 seconds
+Time to vectorize is 6.079673767089844e-05 seconds
+Time to scroll through all raw fileids is 0.13658666610717773 seconds
+Time to fit/transform matrix set is 41.894625186920166 seconds
+Time to transform matrix set is 37.68284034729004 seconds
+Time to fit model is 3.5915424823760986 seconds
+Fitted and ready!
+preparing to scan 8189 files
+trimmed down to 100 files
+
+
+Measure the CountVectorizer
+searching for agreements of type CONVERTIBLE
+Corpus is loading 362 files
+Time to load Plaintext corpus is 0.00011706352233886719 seconds
+Time to vectorize is 1.9788742065429688e-05 seconds
+Time to scroll through all raw fileids is 0.13063859939575195 seconds
+Time to fit/transform matrix set is 40.71795701980591 seconds
+Time to transform matrix set is 36.724249839782715 seconds
+Time to fit model is 1.7176897525787354 seconds
+Fitted and ready!
+preparing to scan 8189 files
+trimmed down to 1000 files
+
+
+
+Measure the TfidfVectorizer
+searching for agreements of type CONVERTIBLE
+Corpus is loading 362 files
+Time to load Plaintext corpus is 0.00011491775512695312 seconds
+Time to vectorize is 3.4809112548828125e-05 seconds
+Time to scroll through all raw fileids is 0.10297536849975586 seconds
+Time to fit/transform matrix set is 41.00924110412598 seconds
+Time to transform matrix set is 37.14337658882141 seconds
+Time to fit model is 3.275237560272217 seconds
+Fitted and ready!
+preparing to scan 8189 files
+trimmed down to 1000 files
+
+"""
+
 
 """
 """
