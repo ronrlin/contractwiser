@@ -15,27 +15,19 @@ TFIDF_VECT = 2
 """
 Alignment describes the process by which agreements of the same kind of are compared
 to one another in a way that "aligns" the provisions within them.  Aligning agreements
-is critical to being able to calculate relatively frequency of certain provisions.  
+is critical to being able to calculate relative frequency of certain provisions.  
 
 """
 class Alignment(object):
 
-    CLAUSE_TYPE = {
-        'interest_rate' : 'train/train_interest_rate',
-        'principal_amount' : 'train/train_principal_amount',
-        'notices' : 'train/train_notices_and_notifications',
-        'registration_rights' : 'train/train_registration_rights',
-    } 
-
-    """
-    Constructor
-
-    :param schema: specify the AgremeentSchema to use for alignment.
-    :param vectorizer: specify the type of vectorization method.
-    :param stop_words: specify stop words to drop from texts.
-
-    """
     def __init__(self, schema=None, vectorizer=COUNT_VECT, stop_words=None):
+        """
+        Create an Alignment object. 
+
+        :param schema: specify the AgremeentSchema to use for alignment.
+        :param vectorizer: specify the type of vectorization method.
+        :param stop_words: specify stop words to drop from texts.
+        """
         print("Load %s agreement training provisions" % schema.get_agreement_type())
         provisions_reqd = schema.get_provisions()
         # provisions_reqd is a tuple (provision_name, provision_path)
@@ -79,23 +71,19 @@ class Alignment(object):
 
         print("Ready for provision alignment.")
 
-    """
-    Function aligns or classifies sentences passed to the function.
-
-    Parameters
-    ----------
-    content : a list of strings
-
-    """
     def align(self, content):
+        """
+        Function aligns or classifies sentences passed to the function.
+
+        :param content: a list of strings
+
+        """
         test_vec = self.vectorizer.transform(content)
         results = self.cll.predict(test_vec)
         return results
 
-    """
-    Returns content with markup to identify provisions within agreement
-    """
     def get_markup(self):
+        """ returns content with markup to identify provisions within agreement """
         return self._content
 
 
