@@ -33,7 +33,7 @@ def create_db():
    print("created wiser_db...")
    collection = db['classified']
    print("created 'classified' collection...")
-   collection.createIndex( { 'filename': "hashed" } )
+   #collection.createIndex( { 'filename': "hashed" } )
    import csv
    agreements = list()
 
@@ -59,7 +59,7 @@ def create_db_new():
    print("created wiser_db...")
    collection = db['classified']
    print("created 'classified' collection...")
-   collection.createIndex( { 'filename': "hashed" } )
+   #collection.createIndex( { 'filename': "hashed" } )
    import csv
    agreements = list()
 
@@ -68,7 +68,7 @@ def create_db_new():
       spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
       for row in spamreader:
          agree = {}
-         agree['filename'] = row[0]
+         agree['filename'] = row[0].join(".txt")
          agree['category'] = row[1] 
          agreements.append(agree)
 
@@ -77,54 +77,49 @@ def create_db_new():
    print(len(result.inserted_ids))
    client.close()
 
-"""
-
-"""
 class WiserDatabase(object):
+   """ """
    def __init__(self):
       self.client = MongoClient('localhost', 27017)
       self.db = self.client['wiser_db']
       self.collection = self.db['classified']
 
-   """
-   Returns records (key/value pairs) corresponding to records with a certain value
-   for the 'filename' value.
-
-   Parameters
-
-   filename : string
-
-   returns Cursor
-   """
    def fetch_by_filename(self, filename):
+      """
+      Returns records (key/value pairs) corresponding to records with a certain value
+      for the 'filename' value.
+
+      :param filename: string
+
+      returns Cursor
+      """
       result = self.collection.find_one({'filename' : filename})
       return result
 
-   """
-   Returns records (key/value pairs) corresponding to records with a certain value
-   for the 'category' value.
-
-   Parameters
-
-   returns Cursor
-   """
    def fetch_by_category(self, category):
+      """
+      Returns records (key/value pairs) corresponding to records with a certain value
+      for the 'category' value.
+
+      :param category: matching a query on all records.
+
+      returns Cursor
+      """
       results = self.collection.find({'category' : category})
       return results
 
-   """
-   Returns a list of the 'category' names.  Categories are different names for 
-   the agreements in the ContractWiser repository.  Examples include 'CONVERTIBLE'
-   for Convertible Note agreements, etc...
-
-   returns a list
-   """
    def get_category_names(self):
+      """
+      Returns a list of the 'category' names.  Categories are different names for 
+      the agreements in the ContractWiser repository.  Examples include 'CONVERTIBLE'
+      for Convertible Note agreements, etc...
+
+      returns a list
+      """
       return self.collection.distinct("category")
 
-   """
-   """
    def add_record(self, filename, category):
+      """ Add a record to the wiser_db """
       new_record = { 'filename' : filename, 'category' : category }
       result = self.collection.insert_one(new_record)
       print("one (1) new record created: " + result.inserted_id)
