@@ -83,7 +83,27 @@ def init():
 
 	with open(SCHEMA_PATH + 'convertible_debt.ini', 'w') as configfile:
 		config.write(configfile)
+
 	# ##################################
+	# Create the nondisclosure agreement schema
+	config = configparser.ConfigParser()
+	config['general'] = {
+		'agreement_type': 'nondisclosure',
+		'version': '1.0',
+	}
+
+	config['provisions'] = {
+		'confidential_information': 'train/train_confidential_information',
+		'nonconfidential_information': 'train/train_nonconfidential_information',
+		'obligations_receiving_party': 'train/train_obligations_receiving_party',
+		'time_period': 'train/train_time_period',
+	}
+
+	config['concepts'] = {
+	}
+
+	with open(SCHEMA_PATH + 'nondisclosure.ini', 'w') as configfile:
+		config.write(configfile)
 
 def main():
 	pass
