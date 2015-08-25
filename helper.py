@@ -2,17 +2,6 @@
 from pymongo import MongoClient
 
 """
-
-"""
-def clear_db():
-   client = MongoClient('localhost', 27017)
-   client['wiser_db'].drop_collection('classified')
-   print("drop 'classified' collection...")
-   client.drop_database('wiser_db')
-   print("drop wiser_db...")
-   client.close()
-
-"""
 TODO: Create a unique index on 'filename'.
 TODO: Check for exceptions in the case that uniqueness is broken.
 TODO: Consider more robust exception handling.
@@ -27,6 +16,16 @@ agreements = [
       'category' : 'indenture',        
    }]
 """
+
+def clear_db():
+   """ Empty the database """
+   client = MongoClient('localhost', 27017)
+   client['wiser_db'].drop_collection('classified')
+   print("drop 'classified' collection...")
+   client.drop_database('wiser_db')
+   print("drop wiser_db...")
+   client.close()
+
 def create_db():
    client = MongoClient('localhost', 27017)
    print(client.database_names())
@@ -40,6 +39,32 @@ def create_db():
 
    # this file is not stored in github
    with open('./archive/classify-temp.csv', 'r') as csvfile:
+      spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+      for row in spamreader:
+         agree = {}
+         agree['filename'] = row[0]
+         agree['category'] = row[1] 
+         agreements.append(agree)
+
+   result = collection.insert_many(agreements)
+   print("new records created")
+   print(len(result.inserted_ids))
+   client.close()
+
+def create_db_new():
+   """ Creates the database for the new dataset """   
+   client = MongoClient('localhost', 27017)
+   print(client.database_names())
+   db = client['wiser_db']
+   print("created wiser_db...")
+   collection = db['classified']
+   print("created 'classified' collection...")
+   collection.createIndex( { 'filename': "hashed" } )
+   import csv
+   agreements = list()
+
+   # this file is not stored in github
+   with open('./classifier-new-data.csv', 'r') as csvfile:
       spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
       for row in spamreader:
          agree = {}
