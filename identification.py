@@ -22,7 +22,6 @@ class AgreementClassifier(object):
 
 		target : list of categories corresponding to the filenames from which 
 			to build a training corpus.
-
 	"""
 	def __init__(self, vectorizer=COUNT_VECT, fileids=[], target=[]):
 		import time
@@ -73,12 +72,12 @@ class AgreementClassifier(object):
 
 	def classify_file(self, filename):
 		"""
-		Parameters
-		----------
-			filename : relative path to a file with filename
+		Classify a given filename by its agreement type.
 
-			return a list containing a string corresponding to the predicted 
-				category of filename.
+		:param filename: relative path to a file with filename
+
+		return a list containing a string corresponding to the predicted 
+			category of filename.
 
 		"""
 		fh = open(filename, 'r')
@@ -169,8 +168,7 @@ def binary_search(vectorizer=COUNT_VECT, search_target='CONVERTIBLE'):
 	# check manually
 
 def main():
-	"""
-	"""
+	"""	"""
 	print("--------------------------------------------")
 	print("welcome to a program to id legal agreements.")
 
@@ -338,6 +336,32 @@ preparing to scan 8189 files
 trimmed down to 1000 files
 
 """
+
+
+
+class Agreement(object):
+	def __init__(self, filename, agreement_type):
+		self.filename = filename
+		self.agreement_type = agreement_type
+
+	def id_party_counterparty(self):
+		""" Figures out who the party and counterparties are in an agreement """
+		pass
+
+	def determine_geography(self):
+		""" 
+		Function that determines the geospatial coordinates relevant to this agreement,
+		usually a US state.  This is usually determined from the Governing Law and Jurisdiction
+		provision.
+		"""
+		pass
+
+	def get_stats(self):
+		""" calculate some stats about the agreement """
+		stats = {
+			'sentence_count' : 0,
+		}
+		return stats	
 
 
 """
