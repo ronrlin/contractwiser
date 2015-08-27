@@ -75,8 +75,9 @@ class Alignment(object):
         """
         Function aligns or classifies sentences passed to the function.
 
-        :param content: a list of strings
+        :param content: a list of strings, where the strings are sentences or paragraphs.
 
+        returns a list corresponding to the type of provision for each element of the list. 
         """
         test_vec = self.vectorizer.transform(content)
         results = self.cll.predict(test_vec)
